@@ -32,7 +32,7 @@ pipeline {
             }
             steps {
                 script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'docker_hub_login') {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
                         app.push("${env.BUILD_NUMBER}")
                         app.push("latest")
                     }
@@ -54,7 +54,7 @@ pipeline {
                 )
             }
         }
-       stage('SmokeTest') {
+        stage('SmokeTest') {
             when {
                 branch 'master'
             }
@@ -79,18 +79,13 @@ pipeline {
                 milestone(1)
                 kubernetesDeploy(
                     kubeconfigId: 'kubeconfig',
-                    configs: 'train-schedule-kube-canary.yml',
-                    enableConfigSubstitution: true
-                )
-                kubernetesDeploy(
-                    kubeconfigId: 'kubeconfig',
                     configs: 'train-schedule-kube.yml',
                     enableConfigSubstitution: true
                 )
             }
         }
     }
-     post {
+    post {
         cleanup {
             kubernetesDeploy (
                 kubeconfigId: 'kubeconfig',
